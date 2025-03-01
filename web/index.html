@@ -18,21 +18,93 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Solar Power Forecasting Web Application">
 
   <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="powerflare">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="Power Flare">
+  <link rel="apple-touch-icon" href="pflogo.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="pflogo.png"/>
 
-  <title>powerflare</title>
+  <!-- Google Maps -->
+  <script>
+    let mapLoadingError = false;
+
+    window.addEventListener('error', function(e) {
+      if (e.target.src && e.target.src.includes('maps.googleapis.com')) {
+        mapLoadingError = true;
+        console.error('Google Maps failed to load:', e.error);
+        gm_authFailure();
+      }
+    }, true);
+
+    function initMap() {
+      console.log('Google Maps API loaded successfully');
+      mapLoadingError = false;
+      window.dispatchEvent(new Event('google_maps_loaded'));
+    }
+    
+    function gm_authFailure() {
+      console.error('Google Maps authentication failed');
+      mapLoadingError = true;
+      const errorDiv = document.getElementById('map-error');
+      errorDiv.style.display = 'block';
+      errorDiv.innerHTML = 'Failed to load Google Maps. Please check your internet connection and API key configuration.';
+      
+      // Hide error after 8 seconds
+      setTimeout(() => {
+        if (errorDiv.style.display === 'block') {
+          errorDiv.style.display = 'none';
+        }
+      }, 8000);
+    }
+
+    // Check if Maps loaded after timeout
+    setTimeout(() => {
+      if (!window.google || !window.google.maps) {
+        console.error('Google Maps failed to load after timeout');
+        gm_authFailure();
+      }
+    }, 5000);
+  </script>
+  <script 
+    src="https://maps.googleapis.com/maps/api/js?v=3&libraries=places,geometry&key=AIzaSyDZVvh3Tpgu_Pjj7AoVxida1h0K1l97x7Y&callback=initMap" 
+    async 
+    defer 
+    onerror="gm_authFailure()"
+  ></script>
+
+  <title>Power Flare</title>
   <link rel="manifest" href="manifest.json">
+
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    const serviceWorkerVersion = null;
+  </script>
+  <!-- This script adds the flutter initialization JS code -->
+  <script src="flutter.js" defer></script>
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <div id="map-error" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #f44336; color: white; padding: 16px; border-radius: 4px; z-index: 1000;">
+    Failed to load Google Maps. Please check your API key configuration.
+  </div>
+  <script>
+    window.addEventListener('load', function(ev) {
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        },
+        onEntrypointLoaded: function(engineInitializer) {
+          engineInitializer.initializeEngine().then(function(appRunner) {
+            appRunner.runApp();
+          });
+        }
+      });
+    });
+  </script>
 </body>
 </html>
